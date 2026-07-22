@@ -8,8 +8,8 @@ import pickle
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-    
-app = FastApi()
+
+app = FastAPI()
 
 tier_1_cities = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata", "Hyderabad", "Pune"]
 tier_2_cities = [
@@ -70,3 +70,14 @@ class Input(BaseModel):
         
 @app.post("/predict")
 def predict(data: Input):
+    input_df =pd.DataFrame([{
+        'bmi': data.bmi,
+        'age_group': data.age_group,
+        'lifestyle_risk': data.lifestyle_risk,
+        'city_tier': data.city_tier,
+        'income_lpa': data.income_lpa,
+        'occupation': data.occupation
+     }])
+
+    prediction = model.predict(input_df)[0]
+    return JSONResponse(status_code = 200, content={"Result": prediction})
