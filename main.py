@@ -75,6 +75,11 @@ class Input(BaseModel):
         v = v.strip().title()
         return v
 
+## Human Readable
+@app.get('/')
+def home():
+    return {'message': 'Premium Insuramce Prediction API'}
+
         
 @app.post("/predict")
 def predict(data: Input):
