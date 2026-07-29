@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Path, HTTPException
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field, computed_field, field_validator
 from typing import Literal, Annotated, Optional
 import pandas as pd
-import pickle 
+import pickle
+
 
 with open('model.pkl', 'rb') as f:
     model = pickle.load(f)
@@ -67,6 +68,13 @@ class Input(BaseModel):
             return 2
         else:
             return 3
+
+    @field_validator('city')
+    @classmethod
+    def normalize_city(cls, v:str) -> str:
+        v = v.strip().title()
+        return v
+
         
 @app.post("/predict")
 def predict(data: Input):
