@@ -80,6 +80,12 @@ class Input(BaseModel):
 def home():
     return {'message': 'Premium Insuramce Prediction API'}
 
+## Matchine Readable
+@app.get('/health')
+def health_check():
+    return {
+       'status': 'OK' 
+    }
         
 @app.post("/predict")
 def predict(data: Input):
