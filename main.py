@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Path, HTTPException
 from fastapi.responses import JSONResponse
 from Schema.user_input import Input
-import pandas as pd
+
 import pickle
-from Model.model import model
+from Model.model import model, predict_output
 
 
 app = FastAPI()
@@ -23,14 +23,18 @@ def health_check():
         
 @app.post("/predict")
 def predict(data: Input):
-    input_df =pd.DataFrame([{
+    input_df ={
         'bmi': data.bmi,
         'age_group': data.age_group,
         'lifestyle_risk': data.lifestyle_risk,
         'city_tier': data.city_tier,
         'income_lpa': data.income_lpa,
         'occupation': data.occupation
-     }])
+     }
+    try:
 
-    prediction = model.predict(input_df)[0]
-    return JSONResponse(status_code = 200, content={"Result": prediction})
+        prediction = predict_output(input_df)
+        return JSONResponse(status_code = 200, content={"Result": prediction})
+    except Exception as e:
+        return JSONResponse(status_code = 500, content = str(e))
+    
