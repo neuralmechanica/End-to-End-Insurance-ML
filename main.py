@@ -12,7 +12,7 @@ app = FastAPI()
 ## Human Readable
 @app.get('/')
 def home():
-    return {'message': 'Premium Insuramce Prediction API'}
+    return {'message': 'Premium Insurance Prediction API'}
 
 ## Matchine Readable
 @app.get('/health')
