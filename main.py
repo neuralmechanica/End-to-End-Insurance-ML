@@ -5,9 +5,13 @@ from Schema.user_input import Input
 import pickle
 from Model.model import model, predict_output
 
+from fastapi.staticfiles import StaticFiles
+
+
 
 app = FastAPI()
 
+app.mount("/app", StaticFiles(directory="static", html = True), name="static")
 
 ## Human Readable
 @app.get('/')

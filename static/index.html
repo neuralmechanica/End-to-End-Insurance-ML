@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>InsureAI – Premium Insurance Prediction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0a8cff;
+    --blue-light: #63b8ff;
+    --ink: #111;
+    --muted: #7a8794;
+    --line: #cfd6dd;
+    --green: #22c55e;
+    --error: #b00020;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; min-height: 100%; }
+
+  body {
+    position: relative;
+    overflow-x: hidden;
+    padding: 36px 48px 64px;
+    font-family: "Poppins", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, #e3effd 0%, #eef5fe 55%, #f5f9ff 100%);
+  }
+
+  /* Soft wave shapes behind the card */
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  body::before {
+    left: -15%;
+    top: 4%;
+    width: 70%;
+    height: 38%;
+    background: rgba(255, 255, 255, 0.55);
+    transform: rotate(-8deg);
+  }
+  body::after {
+    right: -20%;
+    bottom: -18%;
+    width: 85%;
+    height: 45%;
+    background: rgba(200, 224, 250, 0.55);
+    transform: rotate(-6deg);
+  }
+
+  .logo {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+  }
+  .logo span { color: var(--blue); }
+
+  header { text-align: center; margin-top: 8px; }
+
+  h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Card */
+  .card {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 32px;
+    max-width: 1100px;
+    margin: 36px auto 0;
+    padding: 36px 40px;
+    background: #fff;
+    box-shadow: 0 6px 24px rgba(30, 70, 120, 0.08);
+  }
+
+  .row {
+    display: grid;
+    gap: 22px;
+    margin-bottom: 26px;
+  }
+  .row.three { grid-template-columns: repeat(3, 1fr); }
+  .row.two   { grid-template-columns: repeat(2, 1fr); }
+
+  label.title,
+  .group-title {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .unit {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  input[type="number"],
+  input[type="text"] {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--ink);
+    background: #fff;
+  }
+  input::placeholder { color: #9aa5b0; font-size: 12px; }
+
+  input[type="number"]:focus-visible,
+  input[type="text"]:focus-visible {
+    outline: 2px solid var(--blue-light);
+    outline-offset: 0;
+    border-color: var(--blue-light);
+  }
+
+  /* Radios */
+  .radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .radio input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--green);
+    cursor: pointer;
+  }
+
+  .occupation-grid {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+    row-gap: 14px;
+  }
+
+  .smoke-row {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .actions {
+    margin-left: auto;
+    display: flex;
+    gap: 14px;
+  }
+
+  button {
+    width: 120px;
+    height: 40px;
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .btn-reset {
+    background: #fff;
+    color: var(--blue);
+    border: 1px solid var(--blue);
+  }
+  .btn-reset:hover { background: #eef7ff; }
+  .btn-predict {
+    background: var(--blue);
+    color: #fff;
+    border: 1px solid var(--blue);
+  }
+  .btn-predict:hover { background: #0079e6; }
+  .btn-predict:disabled { opacity: 0.6; cursor: wait; }
+
+  /* Output panel */
+  .output {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #8a8f94;
+  }
+  .output-header {
+    padding: 8px 12px;
+    background: var(--blue-light);
+    color: #fff;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .output-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 400;
+    word-break: break-word;
+  }
+  .output-body.result {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 4px;
+    padding: 16px 18px;
+  }
+  .res-label { font-size: 12px; font-weight: 400; color: var(--muted); }
+  .res-category { font-size: 16px; font-weight: 400; color: var(--blue); }
+  .res-confidence { font-size: 13px; font-weight: 400; margin-bottom: 8px; }
+  .res-row {
+    display: grid;
+    grid-template-columns: 70px 1fr 44px;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 400;
+    text-align: left;
+  }
+  .res-bar { height: 6px; background: #e6edf4; border-radius: 4px; overflow: hidden; }
+  .res-bar > div { height: 100%; background: var(--blue-light); }
+  .res-pct { text-align: right; }
+  .output-body.loading { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .output-body.error   { font-size: 14px; font-weight: 400; color: var(--error); }
+</style>
+</head>
+<body>
+
+  <div class="logo">Insure<span>AI</span></div>
+
+  <header>
+    <h1>Premium Insurance Prediction</h1>
+    <p class="subtitle">Enter your details to find out whether you may be eligible for insurance</p>
+  </header>
+
+  <main class="card">
+
+    <form id="predict-form" novalidate>
+      <div class="row three">
+        <div>
+          <label class="title" for="age">Age</label>
+          <input type="number" id="age" name="age" min="1" step="1" placeholder="Enter your age" required>
+        </div>
+        <div>
+          <label class="title" for="weight">Weight <span class="unit">(kg)</span></label>
+          <input type="number" id="weight" name="weight" min="1" step="any" placeholder="Enter your weight" required>
+        </div>
+        <div>
+          <label class="title" for="height">Height <span class="unit">(cm)</span></label>
+          <input type="number" id="height" name="height" min="1" step="any" placeholder="Enter your height" required>
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label class="title" for="income">Annual Income <span class="unit">(BDT)</span></label>
+          <input type="number" id="income" name="income" min="1" step="any" placeholder="Enter annual income" required>
+        </div>
+        <div>
+          <label class="title" for="city">City</label>
+          <input type="text" id="city" name="city" placeholder="Enter your current city" required>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <span class="group-title" id="occupation-label">Occupation</span>
+          <div class="occupation-grid" role="radiogroup" aria-labelledby="occupation-label">
+            <label class="radio"><input type="radio" name="occupation" value="student" required> Student</label>
+            <label class="radio"><input type="radio" name="occupation" value="freelancer"> Freelancer</label>
+            <label class="radio"><input type="radio" name="occupation" value="government_job"> Government Job</label>
+            <label class="radio"><input type="radio" name="occupation" value="private_job"> Private Job</label>
+            <label class="radio"><input type="radio" name="occupation" value="business_owner"> Business Owner</label>
+            <label class="radio"><input type="radio" name="occupation" value="unemployed"> Unemployed</label>
+            <label class="radio"><input type="radio" name="occupation" value="retired"> Retired</label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <span class="group-title" id="smoke-label">Do you smoke?</span>
+        <div class="smoke-row">
+          <div role="radiogroup" aria-labelledby="smoke-label" style="display:flex; gap:28px;">
+            <label class="radio"><input type="radio" name="smoker" value="yes" required> Yes</label>
+            <label class="radio"><input type="radio" name="smoker" value="no"> No</label>
+          </div>
+          <div class="actions">
+            <button type="reset" class="btn-reset" id="reset-btn">Reset</button>
+            <button type="submit" class="btn-predict" id="predict-btn">Predict Now</button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <section class="output" aria-live="polite">
+      <div class="output-header">Predicted Output</div>
+      <div class="output-body" id="output-body"></div>
+    </section>
+
+  </main>
+
+<script>
+  // ====== CONFIG: change these to match your FastAPI backend ======
+  const API_URL = "http://127.0.0.1:8000/predict";
+  // Key names inside "Result" (spelled exactly as your API sends them)
+  const KEY_CATEGORY = "prediction category";
+  const KEY_CONFIDENCE = "confidence";
+  const KEY_PROBS = "class probalities";
+  // ================================================================
+
+  const form = document.getElementById("predict-form");
+  const predictBtn = document.getElementById("predict-btn");
+  const outputBody = document.getElementById("output-body");
+
+  function show(text, state = "") {
+    outputBody.className = "output-body " + state;
+    outputBody.textContent = text;
+  }
+
+  function el(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  // Draws the clean result: category, confidence, and a bar per class
+  function renderResult(result) {
+    if (!result || typeof result !== "object" || !(KEY_CATEGORY in result)) {
+      show(String(result));   // unexpected shape: just show it as text
+      return;
+    }
+    outputBody.className = "output-body result";
+    outputBody.replaceChildren();
+
+    outputBody.append(
+      el("div", "res-label", "Predicted category"),
+      el("div", "res-category", result[KEY_CATEGORY]),
+      el("div", "res-confidence", "Confidence: " + result[KEY_CONFIDENCE])
+    );
+
+    const probs = Object.entries(result[KEY_PROBS] || {}).sort((a, b) => b[1] - a[1]);
+    for (const [label, p] of probs) {
+      const pct = Math.round(p * 1000) / 10;
+      const bar = el("div", "res-bar");
+      const fill = el("div");
+      fill.style.width = pct + "%";
+      bar.append(fill);
+      const row = el("div", "res-row");
+      row.append(el("span", "", label), bar, el("span", "res-pct", pct + "%"));
+      outputBody.append(row);
+    }
+  }
+
+  // Reset also clears the output panel
+  form.addEventListener("reset", () => show(""));
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const fd = new FormData(form);
+    const payload = {
+      age: Number(fd.get("age")),
+      weight: Number(fd.get("weight")),               // kg
+      height: Number(fd.get("height")) / 100,         // cm -> meters (backend BMI uses meters)
+      income_lpa: Number(fd.get("income")) / 100000,  // BDT per year -> lakhs per annum
+      smoker: fd.get("smoker") === "yes",
+      city: fd.get("city").trim(),
+      occupation: fd.get("occupation")
+    };
+
+    predictBtn.disabled = true;
+    show("Predicting…", "loading");
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        // 422 = validation error (list), 500 = plain string
+        const msg = Array.isArray(data.detail)
+          ? data.detail.map(d => d.loc.slice(1).join(".") + ": " + d.msg).join("; ")
+          : (typeof data === "string" ? data : "Server returned " + res.status);
+        throw new Error(msg);
+      }
+      renderResult(data.Result);
+    } catch (err) {
+      show("Could not get a prediction: " + err.message, "error");
+    } finally {
+      predictBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
